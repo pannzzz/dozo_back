@@ -50,8 +50,8 @@ def registro(request):
     else:
         form = CustomUserCreationForm()
         return render(request, 'registrouser.html', {'form': form})
-    
-    
+
+
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect, get_object_or_404
@@ -289,7 +289,7 @@ def eliminar_producto(request, producto_id):
 def mostrar_categoria(request):
     categorias = Categoria.objects.all()
     return render(request, 'categorias/categoria_list.html', {'categorias': categorias})
-    
+
 
 # Crear una nueva categoría
 def crear_categoria(request):
@@ -359,7 +359,7 @@ def eliminar_categoria(request, categoria_id):
         'categoria': categoria
     })
 
-# Carrito Viewsfrom 
+# Carrito Viewsfrom
 
 # Crear un carrito
 def crear_carrito(request):
@@ -513,9 +513,9 @@ class ProductoListAPIView(APIView):
         productos = Producto.objects.filter(estado=True)  # Solo productos activos
         serializer = ProductoSerializer(productos, many=True)
         return Response(serializer.data)
-    
-    
-    
+
+
+
 from rest_framework.generics import RetrieveAPIView
 from .models import Producto
 from .serializers import ProductoSerializer
@@ -523,7 +523,7 @@ from .serializers import ProductoSerializer
 class ProductoDetailAPIView(RetrieveAPIView):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
-    
+
 
 
 # views.py
@@ -568,10 +568,9 @@ from .models import Venta, VentaProducto
 @login_required
 def listar_pedidos_usuario(request):
     try:
-        usuario = request.user  # Obtener el usuario autenticado
+        usuario = request.user
         ventas = Venta.objects.filter(usuario=usuario).select_related('estado')
 
-        # Construimos la respuesta con los pedidos
         pedidos = [
             {
                 "id": venta.id,
@@ -590,11 +589,10 @@ def listar_pedidos_usuario(request):
             for venta in ventas
         ]
 
-        # Devolvemos los pedidos en un JSON
         return JsonResponse({"pedidos": pedidos}, status=200)
     except Exception as e:
-        # En caso de error, devolvemos un mensaje de error
         return JsonResponse({"error": f"Error al obtener pedidos: {str(e)}"}, status=500)
+
 
 
 
@@ -662,7 +660,7 @@ def filter_products(request):
         }
         for p in products
     ]
-    
+
     # Depuración: Verificar los productos filtrados
     print(f"Productos filtrados: {products_data}")
 
@@ -791,9 +789,9 @@ def ventas_view(request):
     return render(request, 'ventas.html', context)
 
 
+from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.contrib.auth.decorators import login_required
 from .serializers import CustomUserSerializer
 
 @api_view(['GET'])
@@ -802,6 +800,8 @@ def user_profile(request):
     user = request.user
     serializer = CustomUserSerializer(user)
     return Response(serializer.data)
+
+
 
 
 from django.http import JsonResponse
@@ -997,10 +997,9 @@ from .models import Venta, VentaProducto
 @login_required
 def listar_pedidos_usuario(request):
     try:
-        usuario = request.user  # Obtener el usuario autenticado
+        usuario = request.user
         ventas = Venta.objects.filter(usuario=usuario).select_related('estado')
 
-        # Construimos la respuesta con los pedidos
         pedidos = [
             {
                 "id": venta.id,
@@ -1019,11 +1018,10 @@ def listar_pedidos_usuario(request):
             for venta in ventas
         ]
 
-        # Devolvemos los pedidos en un JSON
         return JsonResponse({"pedidos": pedidos}, status=200)
     except Exception as e:
-        # En caso de error, devolvemos un mensaje de error
         return JsonResponse({"error": f"Error al obtener pedidos: {str(e)}"}, status=500)
+
 
 
 
@@ -1040,7 +1038,7 @@ def send_reset_password_email(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         email = data.get('email')
-        
+
         try:
             user = User.objects.get(email=email)
             reset_url = f"http://localhost:3000/reset-password/{user.id}"  # URL para el frontend
