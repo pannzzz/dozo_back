@@ -562,10 +562,8 @@ class CartView(APIView):
 
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from .models import Venta, VentaProducto
-from django.core.serializers import serialize
 
 @login_required
 def listar_pedidos_usuario(request):
@@ -573,6 +571,7 @@ def listar_pedidos_usuario(request):
         usuario = request.user  # Obtener el usuario autenticado
         ventas = Venta.objects.filter(usuario=usuario).select_related('estado')
 
+        # Construimos la respuesta con los pedidos
         pedidos = [
             {
                 "id": venta.id,
@@ -585,15 +584,18 @@ def listar_pedidos_usuario(request):
                         "cantidad": vp.cantidad,
                         "precio": float(vp.precio_unidad),
                     }
-                    for vp in venta.productos.all()
+                    for vp in VentaProducto.objects.filter(venta=venta)
                 ]
             }
             for venta in ventas
         ]
 
+        # Devolvemos los pedidos en un JSON
         return JsonResponse({"pedidos": pedidos}, status=200)
     except Exception as e:
+        # En caso de error, devolvemos un mensaje de error
         return JsonResponse({"error": f"Error al obtener pedidos: {str(e)}"}, status=500)
+
 
 
 from rest_framework.views import APIView
@@ -998,6 +1000,7 @@ def listar_pedidos_usuario(request):
         usuario = request.user  # Obtener el usuario autenticado
         ventas = Venta.objects.filter(usuario=usuario).select_related('estado')
 
+        # Construimos la respuesta con los pedidos
         pedidos = [
             {
                 "id": venta.id,
@@ -1016,9 +1019,12 @@ def listar_pedidos_usuario(request):
             for venta in ventas
         ]
 
+        # Devolvemos los pedidos en un JSON
         return JsonResponse({"pedidos": pedidos}, status=200)
     except Exception as e:
+        # En caso de error, devolvemos un mensaje de error
         return JsonResponse({"error": f"Error al obtener pedidos: {str(e)}"}, status=500)
+
 
 
 from django.views.decorators.csrf import csrf_exempt
