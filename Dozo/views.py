@@ -57,6 +57,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect, get_object_or_404
 
 # Mostrar usuarios con paginación
+@login_required
 def mostrar_user(request):
     users_list = CustomUser.objects.all()
     page = request.GET.get('page', 1)  # Obtener el número de página de los parámetros GET
@@ -74,6 +75,7 @@ def mostrar_user(request):
     })
 
 # Editar un usuario
+@login_required
 def editar_user(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     if request.method == 'POST':
@@ -89,6 +91,7 @@ def editar_user(request, user_id):
     })
 
 # Eliminar un usuario
+@login_required
 def eliminar_user(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     if request.method == 'POST':
@@ -157,7 +160,7 @@ def loginzzz(request):
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
-
+@login_required
 def logout(request):
     auth_logout(request)
     return redirect('login')
@@ -170,6 +173,7 @@ from django.contrib.auth import logout
 import json
 
 @csrf_exempt
+@login_required
 def logout_all_sessions(request):
     if request.method == "POST":
         try:
@@ -198,6 +202,7 @@ from .models import Producto
 from .forms import ProductoForm
 
 # Mostrar productos con paginación
+@login_required
 def mostrar_producto(request):
     productos_list = Producto.objects.all()
     page = request.GET.get('page', 1)  # Obtener el número de página de los parámetros GET
@@ -215,6 +220,7 @@ def mostrar_producto(request):
     })
 
 # Crear un producto
+@login_required
 def crear_producto(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST, request.FILES)
@@ -239,6 +245,7 @@ def crear_producto(request):
         })
 
 # Editar un producto
+@login_required
 def editar_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     if request.method == 'POST':
@@ -267,6 +274,7 @@ def editar_producto(request, producto_id):
         })
 
 # Eliminar un producto
+@login_required
 def eliminar_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     if request.method == 'POST':
@@ -286,12 +294,14 @@ def eliminar_producto(request, producto_id):
 
 # Categoria Views
 # Mostrar categorías
+@login_required
 def mostrar_categoria(request):
     categorias = Categoria.objects.all()
     return render(request, 'categorias/categoria_list.html', {'categorias': categorias})
 
 
 # Crear una nueva categoría
+@login_required
 def crear_categoria(request):
     if request.method == 'POST':
         form = CategoriaForm(request.POST)
@@ -316,6 +326,7 @@ def crear_categoria(request):
         })
 
 # Editar una categoría
+@login_required
 def editar_categoria(request, categoria_id):
     categoria = get_object_or_404(Categoria, id=categoria_id)
     if request.method == 'POST':
@@ -344,6 +355,7 @@ def editar_categoria(request, categoria_id):
         })
 
 # Eliminar una categoría
+@login_required
 def eliminar_categoria(request, categoria_id):
     categoria = get_object_or_404(Categoria, id=categoria_id)
     if request.method == 'POST':
@@ -362,6 +374,7 @@ def eliminar_categoria(request, categoria_id):
 # Carrito Viewsfrom
 
 # Crear un carrito
+@login_required
 def crear_carrito(request):
     if request.method == 'POST':
         form = CarritoForm(request.POST)
@@ -390,6 +403,7 @@ def crear_carrito(request):
 # Venta Viewsfrom
 
 # Mostrar ventas
+@login_required
 def mostrar_venta(request):
     ventas = Venta.objects.all()
     return render(request, 'ventas/venta_list.html', {
@@ -458,6 +472,7 @@ def crear_venta_api(request):
 
 
 # Editar una venta
+@login_required
 def editar_venta(request, venta_id):
     venta = get_object_or_404(Venta, id=venta_id)
     if request.method == 'POST':
@@ -486,6 +501,7 @@ def editar_venta(request, venta_id):
         })
 
 # Eliminar una venta
+@login_required
 def eliminar_venta(request, venta_id):
     venta = get_object_or_404(Venta, id=venta_id)
     if request.method == 'POST':
@@ -507,7 +523,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Producto
 from .serializers import ProductoSerializer
-
+@login_required
 class ProductoListAPIView(APIView):
     def get(self, request, *args, **kwargs):
         productos = Producto.objects.filter(estado=True)  # Solo productos activos
@@ -519,7 +535,7 @@ class ProductoListAPIView(APIView):
 from rest_framework.generics import RetrieveAPIView
 from .models import Producto
 from .serializers import ProductoSerializer
-
+@login_required
 class ProductoDetailAPIView(RetrieveAPIView):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
@@ -673,7 +689,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Venta
 from .serializers import VentaSerializer
-
+@login_required
 class PedidoDetailView(APIView):
     def get(self, request, id):
         try:
@@ -683,7 +699,7 @@ class PedidoDetailView(APIView):
         except Venta.DoesNotExist:
             return Response({'error': 'Pedido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
-
+@login_required
 class VentaAPIView(APIView):
     def post(self, request):
         try:
@@ -702,7 +718,7 @@ from django.core.paginator import Paginator
 from django.db.models import Sum, F, Min, Max
 from .models import Venta, VentaProducto, Producto
 from django.db.models.functions import TruncMonth, TruncDay
-
+@login_required
 def ventas_view(request):
     # Recuperar todas las ventas con sus productos
     ventas = Venta.objects.select_related('usuario', 'estado').prefetch_related('productos')
@@ -1041,7 +1057,7 @@ def send_reset_password_email(request):
 
         try:
             user = User.objects.get(email=email)
-            reset_url = f"http://localhost:3000/reset-password/{user.id}"  # URL para el frontend
+            reset_url = f"https://dozo01.pythonanywhere.com/reset-password/{user.id}"  # URL para el frontend
             send_mail(
                 subject="Restablecer contraseña",
                 message=f"Utiliza el siguiente enlace para restablecer tu contraseña: {reset_url}",
